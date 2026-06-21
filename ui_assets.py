@@ -562,9 +562,15 @@ table.tn-history-table tr:last-child td {
 footer { visibility: hidden; }
 .stDeployButton { display: none; }
 
-/* --- Lock Sidebar (Hide Close Button only when open) --- */
-[data-testid="stSidebar"] [data-testid="collapsedControl"], [data-testid="stSidebarCollapseButton"] {
+/* --- Lock Sidebar (Always show, hide all collapse/expand controls) --- */
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
     display: none !important;
+}
+[data-testid="stSidebar"] {
+    min-width: 21rem !important;
+    transform: none !important;
+    visibility: visible !important;
 }
 
 /* --- Vega Lite Chart Overrides (Remove Dark Background & Clean Labels) --- */

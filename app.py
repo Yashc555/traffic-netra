@@ -95,6 +95,12 @@ def init_session():
 
 init_session()
 
+def clear_analysis():
+    st.session_state.results = None
+    st.session_state.annotated_img = None
+    st.session_state.original_img = None
+    st.session_state.plate_text = None
+
 if not st.session_state.logged_in:
     st.markdown("<style>[data-testid='stInputHelperInstructions'] { display: none !important; }</style>", unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
@@ -119,11 +125,6 @@ if not st.session_state.logged_in:
             else:
                 st.error("Authentication failed. Invalid credentials.")
         
-        st.markdown("""
-        <p style="font-size:11px; color:#7D7066; text-align:center; margin-top:24px; font-family:'Inter', sans-serif;">
-            Demo credentials: Officer ID <code>admin</code> &bull; Passcode <code>netra_admin123</code>
-        </p>
-        """, unsafe_allow_html=True)
     st.stop()
 
 # ─── Cached Model Loading ──────────────────────────────────────────────────────
@@ -158,7 +159,9 @@ with st.sidebar:
         "Drop a traffic image",
         type=["jpg", "jpeg", "png", "bmp", "webp"],
         label_visibility="collapsed",
-        key=st.session_state.uploader_key
+        key=st.session_state.uploader_key,
+        on_change=clear_analysis,
+        disabled=st.session_state.get("is_analyzing", False)
     )
     if uploaded_file:
         st.session_state.demo_image = None
@@ -181,10 +184,11 @@ with st.sidebar:
             with col_img:
                 st.image(s["path"], use_container_width=True)
             with col_btn:
-                if st.button(f"Load Sample {i+1}", key=f"demo_{i}", help=f"Load {s['name']}", use_container_width=True):
+                if st.button(f"Load Sample {i+1}", key=f"demo_{i}", help=f"Load {s['name']}", use_container_width=True, disabled=st.session_state.get("is_analyzing", False)):
                     st.session_state.demo_image = s["path"]
                     # Reset the file uploader to avoid conflicts
                     st.session_state.uploader_key = f"uploader_{int(time.time())}_{i}"
+                    clear_analysis()
                     st.rerun()
             st.markdown(f"<div style='font-size:9px; text-align:right; margin-top:-10px; margin-bottom:12px; color:#6E6259; font-weight:600;'>{s['name']}</div>", unsafe_allow_html=True)
 
@@ -230,7 +234,7 @@ tab1, tab2 = st.tabs(["Detection", "Analytics"])
 with tab1:
     col_run, col_status = st.columns([2, 3])
     with col_run:
-        run_analysis = st.button("Run Analysis", use_container_width=True)
+        run_analysis = st.button("Run Analysis", use_container_width=True, disabled=st.session_state.get("is_analyzing", False))
 
     # ─── Load Image ───────────────────────────────────────────────────────────────
     image_ready = False
@@ -262,6 +266,10 @@ with tab1:
 
     # ─── Analysis Execution ────────────────────────────────────────────────────────
     if run_analysis and image_ready:
+        st.session_state.is_analyzing = True
+        st.rerun()
+
+    if st.session_state.get("is_analyzing", False) and image_ready:
         with st.spinner(""):
             progress_placeholder = st.empty()
             progress_placeholder.markdown(f"""
@@ -319,6 +327,7 @@ with tab1:
                     violations = res_json["violations"]
                     plate_text = res_json["plate_text"]
                 except Exception as e:
+                    st.session_state.is_analyzing = False
                     st.error(f"Remote API Inference Error: {e}. Please ensure the local machine server and Cloudflare tunnel are active.")
                     st.stop()
                 
@@ -372,6 +381,7 @@ with tab1:
 
             progress_placeholder.empty()
             time.sleep(0.1)
+            st.session_state.is_analyzing = False
             st.rerun()
 
     # ─── Results Display ──────────────────────────────────────────────────────────
