@@ -10,10 +10,10 @@ Pillow>=10.3.0
 numpy>=1.24.0
 
 # ── Object Detection ─────────────────────────────────────────────────────────
-ultralytics>=8.2.0          # YOLOv8 (downloads yolov8n.pt on first run)
+# ultralytics>=8.2.0          # YOLOv8 (downloads yolov8n.pt on first run) - Backend Only
 
 # ── OCR ──────────────────────────────────────────────────────────────────────
-easyocr>=1.7.1              # Primary OCR engine
+# easyocr>=1.7.1              # Primary OCR engine - Backend Only
 # pytesseract>=0.3.10       # Optional fallback (requires tesseract binary)
 
 # ── PDF Generation ───────────────────────────────────────────────────────────
@@ -26,5 +26,5 @@ requests>=2.31.0
 
 huggingface_hub>=0.23.0
 
-paddlepaddle>=2.6.0
-paddleocr>=2.7.3
+# paddlepaddle>=2.6.0       # Backend Only
+# paddleocr>=2.7.3          # Backend Only
