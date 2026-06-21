@@ -1,0 +1,34 @@
+TrafficNetra Dashboard V2 - Architecture & Deployment Context
+============================================================
+
+1. PROJECT OVERVIEW
+This is a Streamlit-based web application designed for automated traffic violation detection. It processes images, runs object detection (YOLOv8), applies traffic rule logic to flag violations, performs OCR on license plates, and generates a downloadable PDF evidence report.
+
+2. ENTRY POINT & EXECUTION
+- Command to run locally: `streamlit run app.py`
+- Main Entry Point: `app.py`
+- The application is purely Python-based and uses Streamlit's built-in web server. No separate backend/frontend division exists; everything is handled via `app.py`.
+
+3. FILE STRUCTURE & CONNECTIONS
+- `app.py`: The core Streamlit application. Handles the UI layout, routing (Detection vs. Analytics tabs), user authentication (hardcoded admin/netra_admin123), session state management, and orchestrates the inference pipeline.
+- `ui_assets.py`: Contains raw CSS strings (`CUSTOM_CSS`) and SVG icon strings to override default Streamlit styling. It is imported directly into `app.py`.
+- `models/yolo_detector.py`: Contains the `ViolationDetector` class. Wraps the Ultralytics YOLOv8 model to detect vehicles, persons, helmets, and traffic infrastructure.
+- `models/plate_ocr.py`: Contains the `PlateOCR` class. Uses PaddleOCR (with EasyOCR as a fallback) to extract text from detected license plates and uses Regex to validate Indian vehicle registration formats.
+- `utils/image_filters.py`: Contains the `ImagePreprocessor` class. Automatically enhances contrast/brightness of uploaded images before they are passed to the YOLO model.
+- `utils/rules_engine.py`: Contains the `RulesEngine` class. The brain of the violation detection. It takes the raw bounding boxes from YOLO and applies spatial/geometric logic (e.g., checking if 3 people are inside one motorcycle's bounds, or if a vehicle crossed a stop line) to return a list of confirmed violations.
+- `utils/report_gen.py`: Contains the `ReportGenerator` class. Uses `fpdf2` to dynamically compile the image, cropped violation evidence, and metadata into a downloadable, court-admissible PDF document.
+
+4. THE INFERENCE PIPELINE (How it runs)
+When a user uploads an image and clicks "Run Analysis" in `app.py`, the following sequence executes:
+1. Preprocessing (`utils.image_filters`): The image is enhanced for better visibility.
+2. Detection (`models.yolo_detector`): YOLOv8 scans the image and returns a list of bounding boxes (persons, motorcycles, cars, helmets, stop lines).
+3. Rule Evaluation (`utils.rules_engine`): The bounding boxes are analyzed to confirm violations (Triple Riding, No Helmet, Stop Line Violation, Illegal Parking). It returns a list of all broken rules.
+4. Annotation (`models.yolo_detector`): Bounding boxes of the confirmed violations are drawn directly onto the image.
+5. OCR (`models.plate_ocr`): If a license plate is detected, PaddleOCR extracts the registration number.
+6. Report Generation (`utils.report_gen`): The user is given the option to download the results via a generated PDF.
+
+5. DEPLOYMENT NOTES FOR AGENT
+- Framework: Streamlit (Python)
+- Environment Variables: None required by default, though PaddleOCR handles `KMP_DUPLICATE_LIB_OK=TRUE` internally to prevent Windows DLL crashes.
+- Dependencies: Requires `streamlit`, `ultralytics` (YOLO), `paddleocr`, `opencv-python`, `numpy`, `Pillow`, `fpdf2`.
+- Port Configuration: Streamlit runs on port 8501 by default. When linking to a domain/reverse-proxy (like Nginx), ensure WebSockets are supported, as Streamlit relies on them heavily for client-server communication.

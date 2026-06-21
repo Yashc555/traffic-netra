@@ -1,0 +1,30 @@
+# Traffic Netra — Requirements
+# Python 3.9+
+
+# ── Core Framework ──────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── Computer Vision ─────────────────────────────────────────────────────────
+opencv-python-headless>=4.9.0
+Pillow>=10.3.0
+numpy>=1.24.0
+
+# ── Object Detection ─────────────────────────────────────────────────────────
+ultralytics>=8.2.0          # YOLOv8 (downloads yolov8n.pt on first run)
+
+# ── OCR ──────────────────────────────────────────────────────────────────────
+easyocr>=1.7.1              # Primary OCR engine
+# pytesseract>=0.3.10       # Optional fallback (requires tesseract binary)
+
+# ── PDF Generation ───────────────────────────────────────────────────────────
+fpdf2>=2.7.9
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+python-dateutil>=2.8.2
+requests>=2.31.0
+
+
+huggingface_hub>=0.23.0
+
+paddlepaddle>=2.6.0
+paddleocr>=2.7.3
