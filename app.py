@@ -328,7 +328,7 @@ with tab1:
                     plate_text = res_json["plate_text"]
                 except Exception as e:
                     st.session_state.is_analyzing = False
-                    st.error(f"Remote API Inference Error: {e}. Please ensure the local machine server and Cloudflare tunnel are active.")
+                    st.error(f"Server is currently down. Team has been notified and servers should turn back on any moment. Sorry for the inconvenience")
                     st.stop()
                 
                 # Instantiate detector container for annotation methods (doesn't load weights)

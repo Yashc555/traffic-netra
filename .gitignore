@@ -1,2 +1,9 @@
 yolov8n.pt
 __pycache__/
+
+# Background Scripts & Secrets
+supervisor.py
+startup.bat
+restart_server.bat
+run_hidden.vbs
+logs/
