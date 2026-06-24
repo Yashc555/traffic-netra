@@ -123,7 +123,7 @@ if not st.session_state.logged_in:
                 st.session_state.logged_in = True
                 st.rerun()
             else:
-                st.error("Authentication failed. Invalid credentials.")
+                st.error("Invalid credentials. Please check the run instructions or the Pitch Deck for demo credentials.")
         
     st.stop()
 
